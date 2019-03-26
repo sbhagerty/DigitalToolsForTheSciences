@@ -1,0 +1,115 @@
+---
+title: "Cleaning Emissions Data"
+output: html_document
+---
+
+```{r packages, include=FALSE}
+library(tidyverse)
+```
+
+Read in the Data
+Data Catalog from the world bank, the values per year are CO2 metri tons per capita 
+```{r import data}
+CO2 <- read.csv('CO2_perYear.csv', skip=4)
+CO2_metadata <- read.csv('CO2_countryMetaData.csv')
+```
+
+###Cleaning Up the CO2 files
+
+The year columns in the CO2 file all have an X to star and are read in as a string. I'm going to fix this and change them to a numeric. 
+
+```{r years, echo=FALSE}
+yearformat<-function(df){
+  year<-c() # this is where the numeric year values will go 
+  year_badFormat<-df %>% select(starts_with("X"))%>% names() #creating a vector of the years as they are in the dataframe
+
+#This for loop will take each object in year_badformat and get rid of the X and convert it to a numeric then add it to the year vector 
+for( i in 1:length(year_badFormat)){
+  year[i] = as.numeric(substring(year_badFormat[i], 2,5))
+}
+
+#Now we can change the column names to the year values as numeric
+names(df)[(length(names(df))-length(year_badFormat)+1):length(names(df))]<-year 
+
+#Then get remove the objects we no longer need from memory
+rm(year,i, year_badFormat)
+return(df) 
+}
+
+CO2<-yearformat(CO2)
+```
+
+The next problem is that there are a lot of NAs in the dataset. I want to only include countries that have data for all of the years, so I'm going to get rid of any rows with any NAs. I also only want the emission data and the country name, so I'm going to get rid of any extra columns.  
+
+```{r complete cases}
+CO2<-CO2[complete.cases(CO2),]
+```
+Okay, the next problem is that a lot of the rows in the dataset are not countries but different aggregations of countries (e.g. "fragile and conflict affected situations"). I only want observations of countries. I'm going to use the metadata to filter out observations that do not represent countries.    
+```{r preview metadata}
+head(CO2_metadata)
+```
+Just looking at that subsample it seems like for aggregates of countries the Region value is empty. I am going to want the Region to be associated with the country and emission time series.  So I am going to merge the two dataframes, then get rid of any observation that has a row value missing and also get rid of columns I won't need. 
+
+```{r merge w/metadata}
+#merge the data frames 
+CO2 <- left_join(CO2, CO2_metadata, by='Country.Code')
+#get rid of rows where Region value is empty, and get rid of unnecessary columns
+CO2<-CO2 %>% filter(Region != '') %>% select(-c(SpecialNotes, TableName, X, Country.Code, Indicator.Code, Indicator.Name))
+
+#We also won't need the CO2_metadata file anymore
+rm(CO2_metadata)
+```
+
+Okay great, now we have the relatively organized file that we need for CO2 emissions! 
+```{r save co2}
+write_csv(CO2,'~/Desktop/GitHub/Digital-Tools-for-the-Sciences/CO2EmissionsPerYear')
+```
+### Cleaning up the Population Files
+These files are from the world bank and represent total population midyear. 
+```{r import data}
+Pop <- read.csv('Pop_perYear.csv', skip=4)
+Pop_metadata <- read.csv('Pop_countryMetaData.csv')
+```
+
+We need to use the yearFormat function to fix the years again. We also need to get rid of the last two columns where we have no data. Then we'll get rid of observations that do not have complete datasets. 
+```{r}
+Pop<-yearformat(Pop)
+Pop<-Pop[,-c(63,64)] #the last two columns do not have data
+Pop<-Pop[complete.cases(Pop),]
+
+Pop <- left_join(Pop, Pop_metadata, by='Country.Code')
+#get rid of rows where Region value is empty, and get rid of unnecessary columns
+Pop<-Pop %>% filter(Region != '') %>% select(-c(SpecialNotes, TableName, X, Country.Code, Indicator.Code, Indicator.Name))
+
+rm(Pop_metadata)
+```
+Okay we now have a complete data set for Population.  We'll save that too
+```{r save pop}
+write_csv(Pop,'~/Desktop/GitHub/Digital-Tools-for-the-Sciences/PopTotalPerYear')
+```
+
+```{r}
+#install.packages('reshape')
+library(reshape)
+Pop<-melt(Pop, id.vars=c("Country.Name", "IncomeGroup","Region"))
+
+CO2<-melt(CO2, id.vars=c("Country.Name", "IncomeGroup","Region"))
+
+```
+```{r}
+colnames(CO2)[4:5]<-c("Year", "CO2")
+
+colnames(Pop)[4:5]<-c("Year", "Pop")
+```
+
+```{r}
+FinalData <- full_join(CO2, Pop, by=c("Country.Name", "Year", "IncomeGroup", "Region"))
+```
+```{r}
+FinalData<-drop_na(FinalData)
+##change FinalData column CO2 to CO2perCap
+names(FinalData)[5]<-"CO2perCap"
+summary(FinalData)
+write.csv(FinalData,'DataSet.csv', row.names=FALSE)
+```
+

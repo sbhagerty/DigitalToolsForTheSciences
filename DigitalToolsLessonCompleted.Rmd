@@ -1,0 +1,209 @@
+---
+title: "Digital Tools for the Sciences"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+---
+title: "Digital Tools for the Sciences"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+Load your data
+
+```{r}
+Data <- read.csv('DataSet.csv')
+```
+
+Let's view it
+```{r}
+#View(Data)
+```
+This is a data set from the World Bank that has emissions of carbon dioxide (CO2; metric tons per capita), income level,  and population for 149 countries from 1960 to 2014. We can see the column names of the dataframe by calling
+
+```{r}
+names(Data)
+```
+
+You can also get descriptive statistics for the whole dataset
+```{r}
+summary(Data)
+
+```
+
+If you’re only interested in looking at statistics for one variable, like CO2 emissions
+```{r}
+summary(Data$CO2perCap)
+```
+The data set is really large, lets work with just one country for now. We are going to make a smaller data set from Data by filtering all the rows where the Country Name is United States.
+
+```{r}
+UnitedStates<-filter(Data, Country.Name == 'United States')
+```
+We filter out all rows that apply to the United States and we’re copying them to a new dataframe that we are calling ‘UnitedStates’
+
+Let’s confirm that the dataframe ‘UnitedStates’ is what we expect.
+```{r}
+#View(UnitedStates)
+```
+
+If we want to explore the data visually, we can use the ggplot package. It is already loaded. 
+Ggplot uses the Grammar of Graphics, which means that you can build your graphs using the following components: A data set, Aesthetics (color, pattern, fill of variables), Geoms (Geometric objects representing data, lines, bars, points), Statistics (additional functions like regression lines), Scales (legends and labels), Coordinate System (Cartesian, polar..), Facets (subgroups), themes (setting the appearance of the graph)
+
+
+```{r}
+ggplot(UnitedStates,aes(x=Year, y=CO2perCap))+geom_point()+theme_classic()
+```
+
+Can we explain some of this fluctuation with changes in population? Let's look at the population graph too. We have copied the same code we used to graph the CO2 over time and we want you to change one part of it to make a new graph where population is on the y axis.  
+
+```{r}
+ggplot(UnitedStates,aes(x=Year, y=CO2perCap))+geom_point()+theme_classic()
+```
+
+We are also interested in total emission over time, but our data set only has per capita emission of CO2.  We can create a new column in our dataframe that calculates total CO2 emissions from the CO2 per capita and population values for each country in each year.  To do this we use the mutate function.  The arguments for the mutate function is 1) Dataframe we are changing (i.e. mutating) and the name of the new column and how we want to calculate the new column value.  
+
+```{r}
+UnitedStates <- mutate(UnitedStates, CO2total = CO2perCap*Pop)
+```
+Now try graphing this new variable CO2total
+
+```{r}
+##write the code here! 
+ggplot(UnitedStates,aes(x=Year, y=CO2total))+geom_point()+theme_classic()
+```
+Let’s repeat what we just did for another country. You can choose any country from this list:
+
+```{r}
+Data$Country.Name
+```
+
+We’ll go thru this in steps.
+1. Filter the data to create a mini set for your country.
+
+```{r}
+Mexico <- filter(Data, Country.Name=='Mexico')
+```
+2. Plot the Population over time
+```{r}
+ggplot(Mexico, aes(x=Year, y=Pop))+geom_point()+theme_classic()
+```
+
+3. Plot the CO2 per capita over time
+```{r}
+ggplot(Mexico, aes(x=Year, y=CO2perCap))+geom_point()+theme_classic()
+```
+
+4. Create a 'CO2total' column
+```{r}
+Mexico<- mutate(Mexico, CO2total=Pop*CO2perCap)
+```
+
+5. Plot total CO2 emissions.
+```{r}
+ggplot(Mexico, aes(x=Year, y=CO2total))+geom_point()+theme_classic()
+```
+
+Let's compare the total CO2 emissions of US with the country you graphed. We're going to combine the two sets together. We’ll use the function rbind and the arguments are the dataframes for each country
+
+```{r}
+TwoCountries<-rbind(UnitedStates, Mexico)
+```
+
+Plot total CO2 emissions. Because we have two countries we want to be able to tell them apart, we can add color to the aesthetic component of ggplot and let ggplot know we want the colors to be based on the Country.Name column. 
+
+```{r}
+ggplot(TwoCountries,aes(x=Year, y=CO2total, color=Country.Name))+geom_point()+theme_classic()
+```
+
+This is might not be a good idea... their populations are so different.  Let's compare the CO2perCap plots.
+
+```{r}
+ggplot(TwoCountries,aes(x=Year, y=CO2perCap, color=Country.Name))+geom_point()+theme_classic()
+```
+We might want to look at just the most recent years. You can change the x axis by setting the minimum and maximum limits for the x axis with xlim() for ggplot:  
+
+```{r}
+ggplot(TwoCountries,aes(x=Year, y=CO2total, color=Country.Name))+geom_point()+theme_classic()+xlim(2000,2014)
+```
+
+Now that we know how to explore and visualize data, let's go back to the larger dataset now and focus on 2014. Create a new dataframe called Yr2014 and add the CO2 total column to it. 
+
+```{r}
+Yr2014 <- filter(Data, Year == 2014)
+Yr2014 <- mutate(Yr2014, CO2total = Pop*CO2perCap)
+```
+
+The World Bank classifies each country based on Income and we have a column named IncomeGroup for each country, let’s create a plot of the 2014 data where population is on the x axis and total CO2 emissions are on the y axis and the points are colored based on the country’s income group classification.  
+
+```{r}
+ggplot(Yr2014,aes(x=Pop, y=CO2total, color=IncomeGroup))+geom_point()+theme_classic()
+
+```
+We see that there are three outliers that have really high emissions. We want to know what countries are represented by those points.  We can sort the dataframe by CO2total values using arrange(), the first argument that goes into arrange is the dataframe you want to sort and the second argument is the variable you want to sort by, arrange automatically sorts in ascending order, but we want to list the highest values first so we’ll use desc() inside arrange to sort in descending order. 
+
+```{r}
+arrange(Yr2014, desc(CO2total))
+```
+
+We are creating a new dataframe without those 3 outliers. We’ll filter for rows where the country name does not include any of theses: United States, India, China
+
+```{r}
+NoOutliers<-filter(Yr2014, Country.Name != 'United States' & Country.Name !='India' & Country.Name !='China')
+```
+
+Let’s check what happens now...
+
+```{r}
+ggplot(NoOutliers,aes(x=Pop, y=CO2total,color=IncomeGroup))+geom_point()
+
+```
+
+Let’s add a linear regression line 
+```{r}
+ggplot(NoOutliers,aes(x=Pop, y=CO2total,color=IncomeGroup))+geom_point()+geom_smooth(method="lm")+theme_classic()
+```
+
+So now we want to compare what the Big 3 emitters (China, United States, & India) have been up to from 2000-2014. 
+
+1. Subset the Data dataframe for just those three countries, call it 'Big3'
+```{r}
+Big3 <-filter(Data, Country.Name == 'United States' | Country.Name == 'China' | Country.Name =='India')
+```
+
+2. Filter for the years we're interested in 2000 - 2014
+```{r}
+Big3<-filter(Big3, Year >=2000 & Year <=2014)
+```
+
+2.5 Create the total CO2 column in Big3 and plot it over time with each country represented by a different color
+```{r}
+Big3 <- mutate(Big3, CO2total= CO2perCap * Pop)
+ggplot(Big3, aes(x=Year, y=CO2total, color=Country.Name))+geom_point()+theme_classic()
+```
+3. Plot the per capita CO2 for Big3 over time 
+```{r}
+ggplot(Big3, aes(x=Year, y=CO2perCap, color=Country.Name))+geom_point()+theme_classic()
+```
+These graphs are so interesting I want to make sure everyone can see them clearly! Check out this link to identify colors in R that will make your graphs more accessible:
+http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3
+
+We can add the color palette by using the ggplot element scale_color_brewer()
+
+```{r}
+ggplot(Big3, aes(x=Year, y=CO2total, color=Country.Name))+geom_point()+scale_color_brewer(palette='Paired')+theme_classic()
+```
+Try another palette
+```{r}
+#Change the palette the code below is the same as above, change with a new palette name 
+#Note: here we also make the shapes of the points different for each country by adding shape=Country.Name to the aes()
+ggplot(Big3, aes(x=Year, y=CO2total, color=Country.Name, shape=Country.Name))+geom_point(size=2)+scale_color_brewer(palette='Dark2')+theme_classic()
+
+```
+
+
