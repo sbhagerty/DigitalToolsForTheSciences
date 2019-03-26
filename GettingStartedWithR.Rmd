@@ -1,0 +1,256 @@
+---
+title: "Getting Started with R"
+output: html_document
+---
+
+
+
+#### What is R?
+
+R is a programming language designed for statistical computing. It is not just a statistics package, it is a language.
+
+#### Why R?
+
+1. It is FREE. Open source. It is both powerful and flexible
+2. You can store and re-use your analysis. Easier for others to validate your research research.
+3. Excellent community support: R-bloggers, online manuals, tutorials, mailing list, people share their codes
+4. Very popular in academia and business [http://r4stats.com/articles/popularity/]
+
+#### RStudio
+
+A free R integrated development environment (ide). It is cleaner and simpler than the default R GUI.
+Useful features: syntax highlighting and tab for suggested code auto-completion. 
+
+It has a  4-pane workspace: 
+
+* Top left window: it is the R code editor. 
+* Bottom left: interactive console. 
+* Top right window: shows your workspace which includes a list of objects currently in memory, history tab. 
+* Bottom right: shows plots, external packages available on your system, files in your working directory, help files
+
+Useful shortcuts: 
+
+* tab (auto-complete function)
+
+* control+ the up arrow or command + up arrow (auto-complete tool that works only in the interactive console
+
+* control + enter or command + enter(executes the selected lines of code)
+
+
+####  THINGS TO KEEP IN MIND
+
+* Case sensitive
+
+* Use a '#' for comments
+
+* R Does not care about spaces between commands or arguments
+
+* Names should start with a letter and should not contain spaces
+
+* You Can use "." in object names (e.g., "my.data")
+
+* Use forward slash ("/") in path names, even on Windows
+
+
+####  WHAT IS THE WORKING DIRECTORY? 
+
+It is the folder on your computer in which you are working. R will always look for a filename in this folder unless you specifically ask it to look in another folder, even if you have 'file' on your computer, R won't find it unless it is in your working directory or you direct it another folder to find the file.
+
+
+#### R as a calculator
+
+In the gray boxes are below are examples of code run in R. R can be a used as a calculator, for example when you input into R the follwing code:
+
+```{r}
+3+7
+```
+
+We can see in the white box below the code box that R has given us the output for 3+7 is 10
+
+Another example
+```{r}
+5*5
+```
+
+R can also return a logical value: TRUE or FALSE (aka a Boolean). For example if we give it the expression:
+
+```{r}
+4==5
+```
+
+When we use the double equal sign we are asking R to tell us True or False if these two things are exactly the same.  When we use one equal sign we are telling R that two things are the same. For example: 
+
+```{r}
+x = 2 
+x
+```
+
+NOTE that R will not let you assign the value of one number, you will get an error message! 
+
+We usually only assign values to strings (aka letters or words). The clearest way to do this is to use the assignment operator:
+
+```{r}
+x<- 3
+```
+
+You can also assign an equation to a string
+
+```{r}
+y<-x+1
+y
+```
+
+If you're going to be doing the same calculation over and over it can be useful to build a function. Functions are statements organized to perform a specific task. 
+
+R uses the last value we assigned to x and plugs it into the equation x+1 to calculate y. So you can overwrite something you previously assigned really easily, watch out for that.  
+
+See below: 
+
+```{r}
+x <- 100
+y<- x+1
+y
+```
+
+```{r}
+y <- function(x){
+  return(x+1)
+}
+
+```
+
+We named our function 'y', and it has one argument 'x'. We can now calculate y with different values of x. To do this you type the function name followed by parentheses, and inside the parentheses you put the value of the argument. So if we want to calculate y where x is three:
+
+```{r}
+y(3)
+```
+
+And if we want to calculate y where x is 100:
+
+```{r}
+y(100)
+```
+
+R has prewritten functions that come standard when you download R.
+
+One of these functions rm lets you tell R to forget a variable or function you have defined.
+```{r}
+
+rm(x) 
+
+```
+
+You can tell it to forget everything you've defined by:
+
+```{r}
+rm(list=ls())
+```
+
+Its a good idea to use rm to delete any variable or function you're done using. 
+
+Other examples of functions: 
+
+Add the sum of several numbers
+
+```{r}
+sum(1,3,5)
+```
+
+Repeat a string a certain number of times
+
+```{r}
+rep ("hi", times=3)
+```
+
+#### Packages in R 
+
+#### Installing Packages
+
+There are also lots of functions for more specialized tasks that do not come downloaded standard when you download R. Lots of specialized funtions are grouped together in what R calls packages. There are thousands of add-on packages available at the CRAN (Comprehensive R Archive Network). Some packages do come pre-installed. 
+
+To see the packages installed on your computer
+
+```{r, results="hide"}
+.packages (TRUE) 
+```
+
+Packages need to be installed AND loaded for you to use them in R. When you install a package you move it onto your computer.  This like any program that you download.  You still need to open to actually use.  You open the package in R by using the function library, and inputing the package name as the argument.  For example we want to use a package called 'tidyverse', you would type into R: 
+
+
+install.packages('tidyverse')
+
+
+Now we have tidyverse installed.  We can open it in R by using the library function: 
+```{r results = 'hide'}
+library(tidyverse) ## to load a package
+```
+
+#### Data in R 
+
+R can organize data into different structures (i.e. vector, list, matrix, data frame). We're going to focus on vectors and data frames.  
+
+To create a vector we use the c() function, this function combines multiple objects (i.e. numbers, strings, or letters) into an ordered set. 
+
+We can add numbers in a vector by putting them in as arguments into the c function with each number we want in the vector separated by commas
+
+```{r}
+Myvector1 <- c(1,3,4,5) # c for combine/concatenate
+Myvector1
+```
+
+We can also put in a range values, so below we use the semicolon to create a vector that lists all integers 1 to 7 inclusive
+
+```{r}
+Myvector2 <- c(1:7) 
+Myvector2
+```
+
+We can create another vector that is not just integers by using the sequence function 'seq' and specifying the increment we want between the numbers.  So below we create a sequence of numbers bincreasing in increments of 0.5 from 1 to 6
+
+```{r}
+Myvector3 <- seq(1,6, by=0.5)
+Myvector3
+```
+
+You can also store characters in R
+
+```{r}
+greeting <- "hello"
+greeting
+```
+
+You can create vectors of words: 
+
+```{r}
+days <- c ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+
+days
+```
+
+It is important to remember that vectors are ordered combinations of numbers, we can use the order to get specific items in the list.  So if we want the third element in the days vector: 
+
+```{r}
+days[3] 
+```
+
+Or if we want all but the first element in the vector:
+
+```{r}
+days [-1]
+
+```
+
+We can ask R to print more than one item in the vector. So if we want to extract Tuesday, Wednesday and Thrusday
+
+```{r}
+days [c(2,3,4)]
+```
+
+When you create a vector you should know that the c function assumes that everything in your vector is of the same data type (all numbers or all characters) 
+
+```{r}
+Myvector4<- c(1,2,"hello")
+Myvector4
+```
+
+R can convert numbers to characters but not characters to numbers, so to make all things be the same in Myvector4 it makes everything a character. 
