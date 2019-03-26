@@ -87,7 +87,7 @@ We’ll go thru this in steps.
 ```
 2. Plot the Population over time
 ```{r}
-#plot population over tiem for your new mini dataset
+#plot population over item for your new mini dataset
 ```
 
 3. Plot the CO2 per capita over time
