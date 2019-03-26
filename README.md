@@ -7,3 +7,6 @@ During the workshop we used Rstudio Cloud, with a preloaded dataset. That datase
 [DigitalToolsLesson.Rmd](DigitalToolsLesson.Rmd) is the Rmd file the workshop started with, where some of the code boxes are blank so you can practice writing the code.  We have a fully completed version also uploaded called [DigitalToolsLessonCompleted.Rmd](DigitalToolsLessonCompleted.Rmd). 
 
 If you have any questions about this material let us know!
+
+[Margarita Corral](mcorral@brandeis.edu)
+[Shannon Hagerty](shannonhagerty@brandeis.edu)
