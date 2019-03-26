@@ -8,5 +8,8 @@ During the workshop we used Rstudio Cloud, with a preloaded dataset. That datase
 
 If you have any questions about this material let us know!
 
-[Margarita Corral](mcorral@brandeis.edu)
-[Shannon Hagerty](shannonhagerty@brandeis.edu)
+Margrita Corral
+
+Shannon Hagerty
+
+[Brandeis Library Data Services](https://www.brandeis.edu/library/research/data/team.html)
