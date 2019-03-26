@@ -8,7 +8,7 @@ library(tidyverse)
 ```
 
 Read in the Data
-Data Catalog from the world bank, the values per year are CO2 metri tons per capita 
+Data were downloaded from the world bank, the values per year are CO2 metric tons per capita (https://data.worldbank.org/indicator/EN.ATM.CO2E.PC) and for population its in counts (https://data.worldbank.org/indicator/sp.pop.totl)
 ```{r import data}
 CO2 <- read.csv('CO2_perYear.csv', skip=4)
 CO2_metadata <- read.csv('CO2_countryMetaData.csv')
